@@ -20,4 +20,9 @@
         </activity>
     </application>
 
+    <provider
+        android:authorities="com.melderomer.notes.notesprovider"
+        android:name=".NotesProvider"
+        android:exported="false"/>
+
 </manifest>
