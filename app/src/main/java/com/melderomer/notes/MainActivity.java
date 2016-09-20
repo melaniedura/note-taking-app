@@ -1,6 +1,7 @@
 package com.melderomer.notes;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v4.widget.SimpleCursorAdapter;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,6 +20,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
@@ -38,8 +41,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                         .setAction("Action", null).show();
             }
         });
-
-        insertNote("New note");
 
         String[] from = {DBOpenHelper.NOTE_TEXT};
         int[] to = { android.R.id.text1};
@@ -68,17 +69,49 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        switch (id) {
+            case R.id.action_create_sample:
+                insertSampleData();
+                break;
+            case R.id.action_delete_all:
+                deleteAllNotes();
+                break;
         }
-
         return super.onOptionsItemSelected(item);
+    }
+
+    private void deleteAllNotes() {
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (i == DialogInterface.BUTTON_POSITIVE) {
+
+                    getContentResolver().delete(NotesProvider.CONTENT_URI, null, null);
+                    restartLoader();
+
+                    Toast.makeText(MainActivity.this, getString(R.string.all_deleted), Toast.LENGTH_LONG).show();
+                }
+            }
+        };
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage(getString(R.string.are_you_sure))
+                .setPositiveButton(getString(android.R.string.yes), dialogClickListener)
+                .setNegativeButton(getString(android.R.string.no), dialogClickListener)
+                .show();
+    }
+
+    private void insertSampleData() {
+        insertNote("Simple note");
+        insertNote("Multi-line\nnote");
+        insertNote("Very long note with a lot of text that exceeds the width of the screen");
+        restartLoader();
+    }
+
+    private void restartLoader() {
+        getSupportLoaderManager().restartLoader(0, null, this);
     }
 
     @Override
