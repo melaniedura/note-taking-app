@@ -9,4 +9,6 @@
     <string name="save">save</string>
     <string name="note_updated">Note updated</string>
     <string name="delete">delete</string>
+    <string name="note_deleted">Note deleted</string>
+    <string name="note">Note</string>
 </resources>

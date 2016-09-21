@@ -61,7 +61,7 @@ public class EditorActivity extends AppCompatActivity {
                 break;
             case Intent.ACTION_EDIT:
                 if (newText.length() == 0) {
-                    //deleteNote();
+                    deleteNote();
                 } else if (oldText.equals(newText)) {
                     setResult(RESULT_CANCELED);
                 } else {
@@ -69,6 +69,14 @@ public class EditorActivity extends AppCompatActivity {
                 }
         }
         finish();
+    }
+
+    private void deleteNote() {
+        getContentResolver().delete(NotesProvider.CONTENT_URI, noteFilter, null);
+        Toast.makeText(this, R.string.note_deleted, Toast.LENGTH_SHORT).show();
+        setResult(RESULT_OK);
+        finish();
+
     }
 
     private void updateNote(String noteText) {
@@ -109,6 +117,9 @@ public class EditorActivity extends AppCompatActivity {
                 break;
             case R.id.action_save:
                 finishEditing();
+                break;
+            case R.id.action_delete:
+                deleteNote();
                 break;
         }
         return true;
